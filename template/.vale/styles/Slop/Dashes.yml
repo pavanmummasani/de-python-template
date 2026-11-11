@@ -1,0 +1,7 @@
+# Prefer plain punctuation: a colon, comma, parentheses or a new sentence.
+extends: existence
+message: "Replace the em dash with a colon, comma or new sentence."
+level: error
+nonword: true
+tokens:
+  - "—"

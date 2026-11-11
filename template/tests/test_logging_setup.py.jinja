@@ -1,0 +1,24 @@
+import logging
+from collections.abc import Iterator
+
+import pytest
+
+from {{ package_name }}.logging_setup import configure_logging
+
+
+@pytest.fixture(autouse=True)
+def restore_root_logger() -> Iterator[None]:
+    """Undo configure_logging() so later tests keep pytest's handlers."""
+    root = logging.getLogger()
+    handlers, level = root.handlers[:], root.level
+    yield
+    root.handlers[:] = handlers
+    root.setLevel(level)
+
+
+def test_sets_root_level_and_format(capsys: pytest.CaptureFixture[str]) -> None:
+    configure_logging("WARNING")
+
+    assert logging.getLogger().level == logging.WARNING
+    logging.getLogger("demo").warning("hello")
+    assert "WARNING demo: hello" in capsys.readouterr().err

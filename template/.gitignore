@@ -1,0 +1,28 @@
+# Secrets: real values live in .env only. Commit .env.example.
+.env
+.env.*
+!.env.example
+
+# Downloaded data never goes in git. Keep local data under /data at the root.
+/data/
+
+# Python
+__pycache__/
+*.py[cod]
+build/
+dist/
+.venv/
+
+# Tool caches and reports
+.*_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/

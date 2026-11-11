@@ -1,0 +1,48 @@
+from collections.abc import Iterator
+from pathlib import Path
+
+import pytest
+
+from {{ package_name }}.config import Settings, get_settings
+from {{ package_name }}.errors import ConfigError
+
+
+@pytest.fixture(autouse=True)
+def isolated_settings(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> Iterator[None]:
+    """Run each test in an empty folder with no settings env vars or cache."""
+    monkeypatch.chdir(tmp_path)
+    prefix = Settings.model_config.get("env_prefix", "")
+    for field in Settings.model_fields:
+        monkeypatch.delenv(f"{prefix}{field}".upper(), raising=False)
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
+def test_defaults() -> None:
+    settings = get_settings()
+    assert settings.app_env == "dev"
+    assert settings.log_level == "INFO"
+
+
+def test_env_var_overrides_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "prod")
+    assert get_settings().app_env == "prod"
+
+
+def test_dotenv_file_is_read(tmp_path: Path) -> None:
+    (tmp_path / ".env").write_text("LOG_LEVEL=DEBUG\n", encoding="utf-8")
+    assert get_settings().log_level == "DEBUG"
+
+
+def test_log_level_is_case_insensitive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LOG_LEVEL", "debug")
+    assert get_settings().log_level == "DEBUG"
+
+
+def test_invalid_value_raises_config_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "staging")
+    with pytest.raises(ConfigError, match=r"\.env\.example"):
+        get_settings()
