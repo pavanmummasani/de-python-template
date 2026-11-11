@@ -1,0 +1,17 @@
+# Phrases that pad sentences without adding meaning.
+extends: existence
+message: "Cut or rephrase '%s'."
+level: error
+ignorecase: true
+tokens:
+  - in order to
+  - it is worth noting
+  - it's worth noting
+  - it is important to note
+  - needless to say
+  - at the end of the day
+  - in today's
+  - as an AI
+  - let's dive in
+  - basically
+  - obviously

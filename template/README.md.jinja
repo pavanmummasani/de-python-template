@@ -1,0 +1,67 @@
+# {{ project_name }}
+
+[![CI](https://github.com/{{ github_owner }}/{{ project_name }}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{ github_owner }}/{{ project_name }}/actions/workflows/ci.yml)
+
+Data engineering project generated from `de-python-template`.
+
+## Setup
+
+Needs [uv](https://docs.astral.sh/uv/). uv installs the Python version in
+`.python-version`.
+
+```bash
+git init                      # if not already a git repo
+uv lock                       # first time only, then commit uv.lock
+uv sync                       # create .venv with all dev tools
+uv run pre-commit install     # run fast checks on every commit
+cp .env.example .env          # then fill in values
+git add -A                    # hooks only check files git tracks
+uv run poe check
+```
+
+## Everyday commands
+
+| Command               | What it does                               |
+| --------------------- | ------------------------------------------ |
+| `uv run poe check`    | Everything CI runs, in order               |
+| `uv run poe lint`     | Pre-commit hooks on all files              |
+| `uv run poe types`    | mypy strict                                |
+| `uv run poe test`     | pytest with coverage (fails under 80%), skips integration tests |
+| `uv run poe test-integration` | Tests marked `@pytest.mark.integration` (need network or credentials) |
+| `uv run poe review`   | sp-repo-review against the Scientific Python guide |
+
+## Layout
+
+```text
+src/{{ package_name }}/
+  config.py          typed settings from env vars and .env
+  errors.py          ProjectError base class and subclasses
+  logging_setup.py   configure_logging() for entry points
+tests/               pytest
+docs/decisions/      decision records (NNNN-title.md)
+```
+
+## Standards
+
+| Practice              | Standard                                   | Enforced by                     |
+| --------------------- | ------------------------------------------ | ------------------------------- |
+| Project layout        | Scientific Python development guide        | `sp-repo-review` in CI          |
+| Dependencies          | uv with a committed `uv.lock`              | `uv sync --locked` in CI        |
+| Lint and format       | Ruff, including security rules (`S`)       | pre-commit and CI               |
+| Types                 | mypy strict                                | pre-commit and CI               |
+| Tests                 | pytest, coverage at least 80%              | CI                              |
+| Docs and prose        | Markdown structure, no buzzwords or filler | pymarkdown and Vale             |
+| Secrets               | `.env` only, never in code                 | `detect-secrets` in pre-commit  |
+| Workflow security     | zizmor audit of GitHub Actions             | pre-commit and CI               |
+| Dependency updates    | Dependabot, weekly, 7-day cooldown         | GitHub                          |
+| Decisions             | Decision records in `docs/decisions/`      | Review                          |
+
+## Updating from the template
+
+```bash
+uvx copier update --defaults
+```
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

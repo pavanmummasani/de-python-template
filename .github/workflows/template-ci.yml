@@ -1,0 +1,85 @@
+name: Template self-test
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: 3
+  # Not covered by Dependabot; bump by hand.
+  COPIER_VERSION: "9.19.1"
+  PRE_COMMIT_VERSION: "4.7.0"
+
+jobs:
+  repo-lint:
+    name: Lint this repo (docs, prose, workflows)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v9.0.0
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-root-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run root pre-commit hooks
+        run: uvx "pre-commit@${PRE_COMMIT_VERSION}" run --all-files --show-diff-on-failure
+
+  self-test:
+    name: Generate sample (Python ${{ matrix.python-version }}) and run all checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          cache-dependency-glob: template/pyproject.toml.jinja
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-sample-${{ matrix.python-version }}-${{ hashFiles('template/.pre-commit-config.yaml') }}
+
+      - name: Generate sample project
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+        run: >-
+          uvx "copier@${COPIER_VERSION}" copy --defaults --vcs-ref HEAD
+          --data "python_version=${PYTHON_VERSION}" --data github_owner=example-org
+          . "$RUNNER_TEMP/sample"
+
+      - name: Lock and install
+        working-directory: ${{ runner.temp }}/sample
+        run: |
+          git init -q
+          uv lock
+          uv sync --locked
+          git add -A
+
+      - name: Run every sample check
+        working-directory: ${{ runner.temp }}/sample
+        run: uv run poe check

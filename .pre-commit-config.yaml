@@ -1,0 +1,40 @@
+# Checks for this repo's own docs and workflows. Python checks run on a
+# generated sample in template-ci.yml.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: "v0.9.41"
+    hooks:
+      - id: pymarkdown
+        args: ["--disable-rules", "md013", "scan"]
+
+  - repo: local
+    hooks:
+      - id: vale
+        name: vale
+        entry: vale
+        language: python
+        additional_dependencies: ["vale==3.26.0.1"]
+        types: [markdown]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: "v2.4.3"
+    hooks:
+      - id: codespell
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: "0.38.0"
+    hooks:
+      - id: check-dependabot
+      - id: check-github-workflows
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: "v1.29.0"
+    hooks:
+      - id: zizmor

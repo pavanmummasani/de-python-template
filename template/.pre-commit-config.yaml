@@ -1,0 +1,81 @@
+# Fast checks only. Tests run in CI (and in `uv run poe check`), not here.
+exclude: ^\.copier-answers\.yml$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: name-tests-test
+        args: ["--pytest-test-first"]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.17.4"
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format
+        types_or: [python, pyi, jupyter, markdown]
+
+  # mypy from the locked project environment, so versions and imports match
+  # `uv run poe types` exactly.
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: "v1.5.0"
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: ^uv\.lock$
+
+  # Markdown structure: headings, lists, code fences. Settings in pyproject.toml.
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: "v0.9.41"
+    hooks:
+      - id: pymarkdown
+
+  # Prose: buzzwords, filler phrases, em dashes. Rules in .vale/styles/Slop/.
+  - repo: local
+    hooks:
+      - id: vale
+        name: vale
+        entry: vale
+        language: python
+        additional_dependencies: ["vale==3.26.0.1"]
+        types: [markdown]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: "v2.4.3"
+    hooks:
+      - id: codespell
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: "v0.25"
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies: ["validate-pyproject-schema-store[all]"]
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: "0.38.0"
+    hooks:
+      - id: check-dependabot
+      - id: check-github-workflows
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: "v1.29.0"
+    hooks:
+      - id: zizmor

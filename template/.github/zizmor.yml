@@ -1,0 +1,7 @@
+# Configuration for zizmor (https://docs.zizmor.sh)
+rules:
+  unpinned-uses:
+    config:
+      # Tag pins, kept current by Dependabot. Switch to hash pins for stricter supply-chain control.
+      policies:
+        "*": ref-pin

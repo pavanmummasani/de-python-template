@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Actions in this repo and in the generated project's workflows.
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/template"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # Hook revs in this repo's and the template's .pre-commit-config.yaml.
+  - package-ecosystem: "pre-commit"
+    directories:
+      - "/"
+      - "/template"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      hooks:
+        patterns:
+          - "*"

@@ -1,0 +1,45 @@
+# Copier template for data engineering Python projects.
+# Usage: uvx copier copy gh:<owner>/de-python-template <destination>
+
+_min_copier_version: "9.4"
+_subdirectory: template
+_answers_file: .copier-answers.yml
+
+project_name:
+  type: str
+  help: Project name (lowercase, hyphens allowed, e.g. my-data-project)
+  default: my-data-project
+  validator: >-
+    {% if not (project_name | regex_search('^[a-z][a-z0-9-]*[a-z0-9]$')) %}
+    Use lowercase letters, digits and hyphens; start with a letter.
+    {% endif %}
+
+package_name:
+  type: str
+  help: Python import name (lowercase, underscores allowed)
+  default: "{{ project_name | replace('-', '_') }}"
+  validator: >-
+    {% if not (package_name | regex_search('^[a-z][a-z0-9_]*$')) %}
+    Use lowercase letters, digits and underscores; start with a letter.
+    {% elif package_name in ['and', 'as', 'assert', 'async', 'await', 'break',
+      'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally',
+      'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal',
+      'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    '{{ package_name }}' is a Python keyword.
+    {% endif %}
+
+github_owner:
+  type: str
+  help: GitHub user or organization that will host the repo (used in the CI badge)
+  validator: >-
+    {% if not (github_owner | regex_search('^[A-Za-z0-9][A-Za-z0-9-]{0,38}$')) %}
+    Use a valid GitHub user or organization name.
+    {% endif %}
+
+python_version:
+  type: str
+  help: Python version (3.12 matches Databricks serverless and dbt)
+  default: "3.12"
+  choices:
+    - "3.12"
+    - "3.13"

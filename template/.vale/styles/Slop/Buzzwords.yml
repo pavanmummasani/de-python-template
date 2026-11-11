@@ -1,0 +1,26 @@
+# Marketing words that add tone, not information.
+extends: existence
+message: "Avoid '%s'; say what it does instead."
+level: error
+ignorecase: true
+tokens:
+  - best-in-class
+  - cutting-edge
+  - delve
+  - effortless(?:ly)?
+  - elevate
+  - empower(?:s|ing)?
+  - game-changer
+  - holistic
+  - leverag(?:e|es|ed|ing)
+  - next-generation
+  - revolutioni[sz]e
+  - robust
+  - seamless(?:ly)?
+  - state-of-the-art
+  - supercharge
+  - synerg(?:y|ies)
+  - tapestry
+  - unlock(?:s|ing)?
+  - utili[sz]e
+  - world-class
