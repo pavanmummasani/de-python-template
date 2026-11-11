@@ -142,6 +142,8 @@ runtime-evaluated-base-classes = ["pydantic.BaseModel", "pydantic_settings.BaseS
 [tool.pymarkdown]
 # Long lines are normal in tables and links; ruff-format and review handle prose width.
 plugins.md013.enabled = false
+# Allow repeated headings under different parents (Keep a Changelog style).
+plugins.md024.siblings_only = true
 
 
 [tool.repo-review]

@@ -8,6 +8,18 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-11
+
+### Added
+
+- Generated README explains where decision records go.
+
+### Changed
+
+- `.env.example` shows the copy command on its first line.
+- pymarkdown allows repeated headings under different parents, so a
+  Keep a Changelog file passes.
+
 ## [0.1.0] - 2026-11-11
 
 ### Added
@@ -27,5 +39,6 @@ Generated projects receive these changes with `uvx copier update`.
 - Template self-test workflow for each Python version.
 - Decision records 0001 to 0007.
 
-[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/pavanmummasani/de-python-template/releases/tag/v0.1.0
