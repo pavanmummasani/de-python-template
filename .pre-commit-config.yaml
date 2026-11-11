@@ -12,7 +12,8 @@ repos:
     rev: "v0.9.41"
     hooks:
       - id: pymarkdown
-        args: ["--disable-rules", "md013", "scan"]
+        # md024 siblings_only: Keep a Changelog repeats "### Added" per version.
+        args: ["--disable-rules", "md013", "--set", "plugins.md024.siblings_only=$!True", "scan"]
 
   - repo: local
     hooks:
