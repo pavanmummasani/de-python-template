@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false
 
       # uv reads .python-version and installs that Python.
-      - uses: astral-sh/setup-uv@v9.0.0
+      - uses: astral-sh/setup-uv@v10.3.3
 
       - uses: actions/cache@v6
         with:
