@@ -8,6 +8,15 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-12
+
+### Added
+
+- TruffleHog secret scan as a separate CI job in generated projects and in
+  this repo. Verified or unverifiable secrets fail the build. See decision
+  record 0009.
+- README setup step: turn on GitHub secret scanning and push protection.
+
 ## [0.1.2] - 2026-11-12
 
 ### Fixed
@@ -61,7 +70,8 @@ uvx copier update --defaults
 - Template self-test workflow for each Python version.
 - Decision records 0001 to 0007.
 
-[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/pavanmummasani/de-python-template/releases/tag/v0.1.0

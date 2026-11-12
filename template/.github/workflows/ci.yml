@@ -41,3 +41,19 @@ jobs:
       # Same task list as local runs; see [tool.poe.tasks] in pyproject.toml.
       - name: Lint, types, tests, repo-review
         run: uv run poe check
+
+  secrets:
+    name: Secret scan (TruffleHog)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # scan the commits in this push or PR, not only the last
+
+      - uses: trufflesecurity/trufflehog@v3.99.8
+        with:
+          version: 3.99.8 # scanner image; keep equal to the action tag
+          extra_args: --results=verified,unknown

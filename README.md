@@ -19,7 +19,8 @@ library-publishing parts removed and data engineering basics added.
 - **Typed configuration**: settings loaded from environment variables and
   `.env` through pydantic-settings, validated at startup
 - **Secrets kept out of git**: `.env` is ignored, `.env.example` documents
-  every setting, and detect-secrets blocks commits that contain keys
+  every setting, detect-secrets blocks commits that contain keys, and
+  TruffleHog scans every push and pull request in CI
 - **Automated quality gates**: Ruff (including security rules), mypy strict,
   pytest with an 80% coverage gate, and sp-repo-review
 - **One command, same as CI**: `uv run poe check` runs every CI check locally
@@ -143,10 +144,11 @@ endings.
 One-time setup after creating the repository on GitHub:
 
 1. **Protect `main`**: require a pull request and the status checks from
-   `Template self-test` (the repo lint job and one sample job per Python
-   version).
-2. **Enable Dependabot alerts and security updates** under
-   **Settings → Code security**.
+   `Template self-test` (the repo lint job, the secret scan, and one sample
+   job per Python version).
+2. **Turn on security features** under **Settings → Code security**:
+   Dependabot alerts and security updates, secret scanning, and push
+   protection (blocks pushes that contain known key types).
 3. **Release a version** so projects can generate from it and update to it:
 
    ```bash
@@ -159,7 +161,8 @@ One-time setup after creating the repository on GitHub:
    tag on `copier copy` and `copier update`.
 
 Apply the same branch protection to every generated project, requiring the
-`Lint, types, tests, repo-review` check.
+`Lint, types, tests, repo-review` and `Secret scan (TruffleHog)` checks, and
+turn on the same security features.
 
 ## Configuration
 
@@ -231,7 +234,7 @@ graph LR
 | Event                                   | Workflow / tool                  | Description                                                  |
 | --------------------------------------- | -------------------------------- | ------------------------------------------------------------ |
 | `git commit`                            | pre-commit                       | Ruff, mypy, detect-secrets, hygiene, spelling, schemas, zizmor |
-| Pull request opened or updated          | `ci.yml` (project)               | `uv sync --locked`, then `uv run poe check`                  |
+| Pull request opened or updated          | `ci.yml` (project)               | `uv sync --locked`, then `uv run poe check`; TruffleHog secret scan in a parallel job |
 | Push to `main`                          | `ci.yml` (project)               | Same as pull request                                         |
 | Manual dispatch                         | `ci.yml` / `template-ci.yml`     | On-demand rerun                                              |
 | Pull request or push to `main` (template) | `template-ci.yml`              | Lints this repo's docs and workflows; generates a sample per Python version and runs all checks |
@@ -291,7 +294,7 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 | Types              | mypy strict                                       | pre-commit and CI                                      |
 | Tests              | pytest strict mode, coverage at least 80%         | CI                                                     |
 | Docs and prose     | Markdown structure, no buzzwords or filler        | pymarkdown and Vale in pre-commit and CI               |
-| Secrets            | `.env` only, never in code                        | detect-secrets                                         |
+| Secrets            | `.env` only, never in code                        | detect-secrets (commit), TruffleHog (CI), GitHub push protection |
 | Workflow security  | Least-privilege permissions, zizmor audit         | pre-commit and CI                                      |
 | Dependency updates | Dependabot, weekly, 7-day cooldown                | GitHub                                                 |
 | Template integrity | Generate per Python version, run all checks       | [`template-ci.yml`](.github/workflows/template-ci.yml) |
@@ -309,6 +312,7 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 | 0006 | [poe as the task runner](docs/decisions/0006-poe-task-runner.md)                                         |
 | 0007 | [Lint Markdown structure and prose](docs/decisions/0007-markdown-and-prose-linting.md)                   |
 | 0008 | [Force LF line endings](docs/decisions/0008-force-lf-line-endings.md)                                    |
+| 0009 | [Layered secret scanning](docs/decisions/0009-layered-secret-scanning.md)                                |
 
 ## Troubleshooting
 

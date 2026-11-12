@@ -51,7 +51,7 @@ docs/decisions/      decision records (NNNN-title.md)
 | Types                 | mypy strict                                | pre-commit and CI               |
 | Tests                 | pytest, coverage at least 80%              | CI                              |
 | Docs and prose        | Markdown structure, no buzzwords or filler | pymarkdown and Vale             |
-| Secrets               | `.env` only, never in code                 | `detect-secrets` in pre-commit  |
+| Secrets               | `.env` only, never in code                 | detect-secrets (commit), TruffleHog (CI), GitHub push protection |
 | Workflow security     | zizmor audit of GitHub Actions             | pre-commit and CI               |
 | Dependency updates    | Dependabot, weekly, 7-day cooldown         | GitHub                          |
 | Decisions             | Decision records in `docs/decisions/`      | Review                          |
