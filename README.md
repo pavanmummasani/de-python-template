@@ -145,7 +145,7 @@ One-time setup after creating the repository on GitHub:
 
 1. **Protect `main`**: require a pull request and the status checks from
    `Template self-test` (the repo lint job, the secret scan, and one sample
-   job per Python version).
+   job per Python version), and block force-pushes.
 2. **Turn on security features** under **Settings → Code security**:
    Dependabot alerts and security updates, secret scanning, and push
    protection (blocks pushes that contain known key types).
@@ -342,6 +342,15 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 
 - Compare `.env` with `.env.example`. Check spelling and allowed values
   (for example `APP_ENV` must be `dev` or `prod`).
+
+#### Secret scan fails
+
+- A found key is live, or its live check errored: revoke the key at the
+  provider, then remove it from history.
+- After a deliberate history rewrite on `main`, the push's starting commit
+  no longer exists and the scan errors. Rerun the workflow manually.
+- "action is vX but scanner version is Y": set the `version:` line next to
+  the TruffleHog action to the same number.
 
 #### Coverage below 80%
 
