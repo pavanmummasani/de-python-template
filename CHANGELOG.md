@@ -8,6 +8,11 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+### Fixed
+
+- The Vale hook runs in one process. On a fresh hook environment, parallel
+  batches raced to download the Vale binary and failed with "Text file busy".
+
 ## [0.2.2] - 2026-11-12
 
 ### Changed
