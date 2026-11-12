@@ -23,6 +23,9 @@ repos:
         language: python
         additional_dependencies: ["vale==3.26.0.1"]
         types: [markdown]
+        # The vale package downloads its binary on first run; parallel
+        # batches race on that download ("Text file busy").
+        require_serial: true
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.3"
