@@ -8,6 +8,28 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-12
+
+### Fixed
+
+- `.gitattributes` (`* text=auto eol=lf`) in the template repo and in
+  generated projects. On Windows with `core.autocrlf=true`, `copier update`
+  produced CRLF files, and the mixed-line-ending hook failed after local edits.
+  See decision record 0008.
+
+### Upgrade notes
+
+Only for projects generated on Windows before 0.1.2. From a clean working
+tree (commit first), before running `copier update`:
+
+```bash
+git config --global core.autocrlf input      # once per Windows machine
+git rm --cached -r -q . && git reset --hard  # rewrite working files with LF
+uvx copier update --defaults
+```
+
+`git reset --hard` discards uncommitted changes, so commit everything first.
+
 ## [0.1.1] - 2026-11-11
 
 ### Added
@@ -39,6 +61,7 @@ Generated projects receive these changes with `uvx copier update`.
 - Template self-test workflow for each Python version.
 - Decision records 0001 to 0007.
 
-[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/pavanmummasani/de-python-template/releases/tag/v0.1.0

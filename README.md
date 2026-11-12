@@ -55,11 +55,13 @@ de-python-template/
 │   ├── .vale/styles/Slop/            # Prose rules: buzzwords, filler, em dashes
 │   ├── .vale.ini                     # Vale prose linter settings
 │   ├── .env.example                  # Every setting, no real values
+│   ├── .gitattributes                # LF line endings on every OS
 │   ├── .pre-commit-config.yaml       # Fast commit-time checks
 │   ├── .secrets.baseline             # detect-secrets baseline
 │   ├── pyproject.toml.jinja          # Dependencies, tool configuration, poe tasks
 │   └── README.md.jinja               # Project README with its own Standards table
-├── .pre-commit-config.yaml           # Markdown, prose and spelling checks for this repo's docs
+├── .gitattributes                    # LF line endings on every OS
+├── .pre-commit-config.yaml           # Docs, prose, spelling and workflow checks for this repo
 ├── .vale.ini                         # Reuses the template's Vale rules
 ├── CHANGELOG.md                      # Changes per template version
 ├── copier.yml                        # Template questions and validation
@@ -75,7 +77,9 @@ questions; all other files are copied as they are.
 ### For Data Engineers
 
 **Prerequisites:** [uv](https://docs.astral.sh/uv/) and Git. uv installs
-Python and every other tool.
+Python and every other tool. On Windows, run
+`git config --global core.autocrlf input` once, so files keep LF line
+endings.
 
 1. Generate a new project:
 
@@ -304,6 +308,7 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 | 0005 | [Generated-project CI on Linux with one Python version](docs/decisions/0005-linux-only-ci.md)            |
 | 0006 | [poe as the task runner](docs/decisions/0006-poe-task-runner.md)                                         |
 | 0007 | [Lint Markdown structure and prose](docs/decisions/0007-markdown-and-prose-linting.md)                   |
+| 0008 | [Force LF line endings](docs/decisions/0008-force-lf-line-endings.md)                                    |
 
 ## Troubleshooting
 
@@ -342,6 +347,14 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 
 - Resolve the inline conflict markers, then run `uv lock` and
   `uv run poe check`.
+- Whole files marked as changed on Windows usually mean CRLF line endings.
+  Follow the 0.1.2 upgrade notes in `CHANGELOG.md`.
+
+#### "mixed line ending" fails on Windows
+
+- Files were written with CRLF. Set `git config --global core.autocrlf input`,
+  commit, then run `git rm --cached -r -q . && git reset --hard` to rewrite
+  them with LF.
 
 ### Debug Commands
 

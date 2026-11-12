@@ -1,6 +1,7 @@
 # 0002: Drop library publishing, docs site and nox
 
-**Status:** Accepted
+**Status:** Accepted; amended by 0008 (`.gitattributes` returns, for line
+endings)
 
 **Context:** Cookie targets libraries published to PyPI with a hosted docs
 site. Data engineering projects are deployed, not published.
