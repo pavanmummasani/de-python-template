@@ -8,6 +8,14 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-11-12
+
+### Changed
+
+- Pre-commit hooks in generated projects: validate-pyproject v0.27,
+  check-jsonschema 0.39.0, zizmor v1.32.0.
+- Generated CI uses `astral-sh/setup-uv` v10.3.3.
+
 ### Fixed
 
 - The Vale hook runs in one process. On a fresh hook environment, parallel
@@ -108,7 +116,8 @@ uvx copier update --defaults
 - Template self-test workflow for each Python version.
 - Decision records 0001 to 0007.
 
-[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.2...v0.2.0
