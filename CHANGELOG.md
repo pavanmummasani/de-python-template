@@ -8,6 +8,26 @@ Generated projects receive these changes with `uvx copier update`.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-12
+
+### Changed
+
+- The TruffleHog scan moved from `ci.yml` to its own workflow,
+  `secrets.yml`. Each push scan has its own concurrency group, so it is
+  never cancelled; a newer commit on a pull request cancels the older PR
+  scan. The tag/version guard step from 0.2.1 is removed; the `version:`
+  input is bumped by hand with the action.
+
+### Fixed
+
+- A newer push could still cancel a pending scan in 0.2.1, leaving that
+  push's commits unscanned. Scans are no longer cancelled.
+- The 0.2.1 guard step could read the wrong `version:` line and break the
+  scan job.
+- Earlier entries overstated the scan: keys confirmed live, or whose live
+  check errored, fail the build; keys that fail the live check are not
+  reported. Decision record 0009 says so.
+
 ## [0.2.1] - 2026-11-12
 
 ### Fixed
@@ -26,7 +46,8 @@ Generated projects receive these changes with `uvx copier update`.
 ### Added
 
 - TruffleHog secret scan as a separate CI job in generated projects and in
-  this repo. See decision record 0009.
+  this repo. Verified or unverifiable secrets fail the build. See decision
+  record 0009.
 - README setup step: turn on GitHub secret scanning and push protection.
 
 ## [0.1.2] - 2026-11-12
@@ -82,7 +103,8 @@ uvx copier update --defaults
 - Template self-test workflow for each Python version.
 - Decision records 0001 to 0007.
 
-[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/pavanmummasani/de-python-template/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/pavanmummasani/de-python-template/compare/v0.1.1...v0.1.2
