@@ -9,11 +9,9 @@ on:
 
 permissions: {}
 
-# Cancel superseded PR runs only. Push runs on main always finish, so every
-# pushed commit gets its secret scan.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 env:
   FORCE_COLOR: 3
@@ -41,34 +39,6 @@ jobs:
 
       - name: Run root pre-commit hooks
         run: uvx "pre-commit@${PRE_COMMIT_VERSION}" run --all-files --show-diff-on-failure
-
-  secrets:
-    name: Secret scan (TruffleHog)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-          fetch-depth: 0 # scan the commits in this push or PR, not only the last
-
-      # Dependabot bumps the action tag but not `version:`; fail until both match.
-      - name: Check TruffleHog action tag matches scanner version
-        env:
-          WORKFLOW_FILE: .github/workflows/template-ci.yml
-        run: |
-          tag=$(sed -nE 's#.*trufflesecurity/trufflehog@v([0-9.]+).*#\1#p' "$WORKFLOW_FILE")
-          scanner=$(sed -nE 's#^[[:space:]]+version: ([0-9.]+).*#\1#p' "$WORKFLOW_FILE")
-          if [ -z "$tag" ] || [ "$tag" != "$scanner" ]; then
-            echo "::error::TruffleHog action is v$tag but scanner version is $scanner; make them equal."
-            exit 1
-          fi
-
-      - uses: trufflesecurity/trufflehog@v3.99.8
-        with:
-          version: 3.99.8 # scanner image; keep equal to the action tag
-          extra_args: --results=verified,unknown
 
   self-test:
     name: Generate sample (Python ${{ matrix.python-version }}) and run all checks

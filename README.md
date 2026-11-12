@@ -37,6 +37,7 @@ library-publishing parts removed and data engineering basics added.
 de-python-template/
 ├── .github/
 │   ├── workflows/
+│   │   ├── secrets.yml               # TruffleHog secret scan of every push and pull request
 │   │   └── template-ci.yml           # Self-test: generate sample per Python version, run all checks
 │   ├── dependabot.yml                # Action and hook updates for this repo and the template
 │   └── zizmor.yml                    # Workflow security audit settings
@@ -45,6 +46,7 @@ de-python-template/
 ├── template/                         # Everything below is rendered into a new project
 │   ├── .github/
 │   │   ├── workflows/ci.yml          # Project CI: uv sync --locked, then poe check
+│   │   ├── workflows/secrets.yml     # TruffleHog secret scan
 │   │   ├── dependabot.yml            # Actions, pre-commit hooks and uv updates
 │   │   └── zizmor.yml
 │   ├── docs/decisions/               # Project decision records (starts with 0000)
@@ -143,9 +145,9 @@ endings.
 
 One-time setup after creating the repository on GitHub:
 
-1. **Protect `main`**: require a pull request and the status checks from
-   `Template self-test` (the repo lint job, the secret scan, and one sample
-   job per Python version), and block force-pushes.
+1. **Protect `main`**: require a pull request, the `Template self-test`
+   checks (repo lint and one sample job per Python version) and the
+   `Secret scan (TruffleHog)` check, and block force-pushes.
 2. **Turn on security features** under **Settings → Code security**:
    Dependabot alerts and security updates, secret scanning, and push
    protection (blocks pushes that contain known key types).
@@ -160,9 +162,9 @@ One-time setup after creating the repository on GitHub:
    `CHANGELOG.md` under the new version first. Projects pick up the newest
    tag on `copier copy` and `copier update`.
 
-Apply the same branch protection to every generated project, requiring the
-`Lint, types, tests, repo-review` and `Secret scan (TruffleHog)` checks, and
-turn on the same security features.
+Each generated project's README has the same setup steps for its own
+repository (required checks: `Lint, types, tests, repo-review` and
+`Secret scan (TruffleHog)`; block force-pushes).
 
 ## Configuration
 
@@ -207,7 +209,7 @@ needs them, and pass them to steps through `env:`, not inline expressions.
 | ----------------------- | --------------------------------------------------------- |
 | `[project]`             | Name, Python requirement, runtime dependencies            |
 | `[dependency-groups]`   | Dev tools: mypy, poe, pre-commit, pytest, sp-repo-review  |
-| `[tool.poe.tasks]`      | `lint`, `types`, `test`, `review`, `check`                |
+| `[tool.poe.tasks]`      | `lint`, `types`, `test`, `test-integration`, `review`, `check` |
 | `[tool.pytest]`         | Strict mode, warnings as errors, test paths               |
 | `[tool.coverage]`       | Source package, `fail_under = 80`                         |
 | `[tool.mypy]`           | Strict mode and extra error codes                         |
@@ -234,9 +236,10 @@ graph LR
 | Event                                   | Workflow / tool                  | Description                                                  |
 | --------------------------------------- | -------------------------------- | ------------------------------------------------------------ |
 | `git commit`                            | pre-commit                       | Ruff, mypy, detect-secrets, hygiene, spelling, schemas, zizmor |
-| Pull request opened or updated          | `ci.yml` (project)               | `uv sync --locked`, then `uv run poe check`; TruffleHog secret scan in a parallel job |
+| Pull request opened or updated          | `ci.yml` (project)               | `uv sync --locked`, then `uv run poe check`                  |
 | Push to `main`                          | `ci.yml` (project)               | Same as pull request                                         |
-| Manual dispatch                         | `ci.yml` / `template-ci.yml`     | On-demand rerun                                              |
+| Pull request or push to `main`          | `secrets.yml` (project and template) | TruffleHog scan of every commit; push scans are never cancelled |
+| Manual dispatch                         | any workflow                     | On-demand run ("Run workflow")                               |
 | Pull request or push to `main` (template) | `template-ci.yml`              | Lints this repo's docs and workflows; generates a sample per Python version and runs all checks |
 | Weekly                                  | Dependabot                       | Grouped update PRs for Actions, hooks and uv (7-day cooldown) |
 
@@ -244,9 +247,10 @@ graph LR
 
 ### 1. Commit (pre-commit)
 
-Fast checks run only on staged files and block the commit on failure:
+Fast checks run on staged files (mypy checks all of `src/` and `tests/`)
+and block the commit on failure:
 
-1. File hygiene: large files, merge markers, trailing whitespace, YAML/TOML syntax
+1. File hygiene: large files, merge markers, trailing whitespace, YAML syntax
 2. Ruff lint (with auto-fix) and Ruff format
 3. mypy strict, run from the locked project environment
 4. detect-secrets against `.secrets.baseline`
@@ -348,9 +352,11 @@ Copier applies a three-way merge and marks any conflicts inline for review.
 - A found key is live, or its live check errored: revoke the key at the
   provider, then remove it from history.
 - After a deliberate history rewrite on `main`, the push's starting commit
-  no longer exists and the scan errors. Rerun the workflow manually.
-- "action is vX but scanner version is Y": set the `version:` line next to
-  the TruffleHog action to the same number.
+  no longer exists and the scan errors. Start a new run with
+  **Actions → Secret scan → Run workflow**; "Re-run jobs" reuses the
+  missing commit and fails again.
+- When Dependabot bumps the TruffleHog action, set the `version:` line in
+  `secrets.yml` to the same number in that pull request.
 
 #### Coverage below 80%
 
