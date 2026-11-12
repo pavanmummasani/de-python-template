@@ -4,16 +4,19 @@
 
 **Context:** detect-secrets runs at commit time, but a commit made with
 `--no-verify`, from another machine, or before hooks were installed skips
-it. Projects will hold API keys for FRED, Tiingo, Alpha Vantage and cloud
-platforms.
+it. Data projects hold third-party API keys and cloud credentials.
 
 **Decision:** Three layers. detect-secrets in pre-commit (blocks locally).
-TruffleHog in CI as its own job (scans every commit in a push or pull
-request and checks whether a found key is live; verified or unverifiable
-results fail the build). GitHub secret scanning with push protection
-(rejects known key types at push). gitleaks is not added: it overlaps with
-detect-secrets.
+TruffleHog in CI as its own job, scanning every commit in a push or pull
+request with `--results=verified,unknown`: a key confirmed live, or one
+whose live check errored, fails the build; keys confirmed dead
+(`unverified`) are not reported, which keeps false alarms low. GitHub
+secret scanning with push protection rejects known key types at push.
+gitleaks is not added: it overlaps with detect-secrets.
 
-**Consequence:** The TruffleHog action tag and its `version:` input must
-move together; Dependabot bumps only the tag. The TruffleHog pre-commit hook
-is not used because it needs a separate binary or Docker.
+**Consequence:** Push runs are never cancelled, so no pushed commit skips
+the scan. A guard step fails CI when the action tag and the scanner
+`version:` drift apart (Dependabot bumps only the tag). Branch protection
+blocks force-pushes to `main`; after a deliberate history rewrite, rerun the
+workflow manually. The TruffleHog pre-commit hook is not used because it
+needs a separate binary or Docker.

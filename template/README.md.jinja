@@ -19,6 +19,16 @@ git add -A                    # hooks only check files git tracks
 uv run poe check
 ```
 
+## Repository setup (once, on GitHub)
+
+Under **Settings**:
+
+1. **Code security:** turn on Dependabot alerts and security updates,
+   secret scanning, and push protection.
+2. **Branches:** protect `main`. Require a pull request and the
+   `Lint, types, tests, repo-review` and `Secret scan (TruffleHog)` checks,
+   and block force-pushes.
+
 ## Everyday commands
 
 | Command               | What it does                               |
