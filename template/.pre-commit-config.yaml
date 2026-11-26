@@ -17,7 +17,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.17.4"
+    rev: "v0.17.5"
     hooks:
       - id: ruff-check
         args: ["--fix"]
@@ -44,7 +44,7 @@ repos:
 
   # Markdown structure: headings, lists, code fences. Settings in pyproject.toml.
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: "v0.9.41"
+    rev: "v0.9.42"
     hooks:
       - id: pymarkdown
 
